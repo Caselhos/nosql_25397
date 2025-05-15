@@ -100,18 +100,32 @@ exports.getMovieStats = async (req, res) => {
   }
 };
 
-// Full-text search
+// Full-text search with pagination
 exports.searchMovies = async (req, res) => {
   try {
     const q = req.query.q;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     if (!q) return res.status(400).json({ error: "Missing search query" });
-    const movies = await Movie.find(
-      { $text: { $search: q } },
-      { score: { $meta: "textScore" } }
-    )
-      .sort({ score: { $meta: "textScore" } })
-      .limit(20);
-    res.json(movies);
+
+    const filter = { $text: { $search: q } };
+
+    const [movies, count] = await Promise.all([
+      Movie.find(filter, { score: { $meta: "textScore" } })
+        .sort({ score: { $meta: "textScore" } })
+        .skip(skip)
+        .limit(limit),
+      Movie.countDocuments(filter)
+    ]);
+
+    res.json({
+      data: movies,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      totalResults: count
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to search movies" });
   }
