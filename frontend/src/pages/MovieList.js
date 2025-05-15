@@ -1,7 +1,7 @@
 // src/components/MovieList.js
 import React, { useEffect, useState } from "react";
 import { Grid, Container, CircularProgress } from "@mui/material";
-import MovieCard from "./MovieCard";
+import MovieCard from "../components/MovieCard";
 import { fetchMovies } from "../services/api";
 
 const MovieList = () => {
