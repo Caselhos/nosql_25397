@@ -1,6 +1,7 @@
 // src/components/MovieList.js
 import React, { useEffect, useState } from "react";
-import { Grid, Container, CircularProgress, Pagination, Box } from "@mui/material";
+import { Grid, Container, CircularProgress, Pagination, Box, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import { fetchMovies } from "../services/api";
 
@@ -9,6 +10,7 @@ const MovieList = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const loadMovies = async (pageNum = 1) => {
     setLoading(true);
@@ -36,6 +38,11 @@ const MovieList = () => {
 
   return (
     <Container sx={{ py: 4 }}>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button variant="contained" onClick={() => navigate("/add")}>
+          Add Movie
+        </Button>
+      </Box>
       <Grid container spacing={4}>
         {movies.map((movie) => (
           <Grid item key={movie._id} xs={12} sm={6} md={4}>

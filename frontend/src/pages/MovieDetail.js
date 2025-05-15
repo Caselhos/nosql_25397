@@ -1,11 +1,12 @@
 // src/components/MovieDetail.js
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Container, Typography, Box, Chip, CircularProgress, Paper } from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";
+import { Container, Typography, Box, Chip, CircularProgress, Paper, Button } from "@mui/material";
 import axios from "axios";
 
 const MovieDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +25,17 @@ const MovieDetail = () => {
     fetchMovie();
   }, [id]);
 
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this movie?")) {
+      try {
+        await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/movies/${movie._id}`);
+        navigate("/");
+      } catch (err) {
+        alert("Failed to delete movie");
+      }
+    }
+  };
+
   if (loading) return <CircularProgress sx={{ m: 4 }} />;
   if (!movie) return <Typography>Movie not found.</Typography>;
 
@@ -37,6 +49,14 @@ const MovieDetail = () => {
         {movie.genres && movie.genres.map((genre, idx) => (
           <Chip key={idx} label={genre} sx={{ mr: 1 }} />
         ))}
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        <Button variant="outlined" sx={{ mr: 2 }} onClick={() => navigate(`/edit/${movie._id}`)}>
+          Edit
+        </Button>
+        <Button variant="contained" color="error" onClick={handleDelete}>
+          Delete
+        </Button>
       </Box>
       {movie.plot && (
         <Paper sx={{ p: 2, mb: 2 }}>
