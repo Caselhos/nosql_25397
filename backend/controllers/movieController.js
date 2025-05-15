@@ -75,32 +75,28 @@ exports.deleteMovie = async (req, res) => {
 exports.getMovieStats = async (req, res) => {
   try {
     const stats = await Movie.aggregate([
-      {
-        $unwind: "$genres"
-      },
+      { $unwind: "$genres" },
       {
         $group: {
           _id: "$genres",
           count: { $sum: 1 },
-          avgRating: { $avg: "$imdb.rating" }
+          avgRating: { $avg: { $ifNull: ["$imdb.rating", 0] } }
         }
       },
-      {
-        $sort: { count: -1 }
-      }
+      { $sort: { count: -1 } }
     ]);
     const overall = await Movie.aggregate([
       {
         $group: {
           _id: null,
-          avgImdbRating: { $avg: "$imdb.rating" },
+          avgImdbRating: { $avg: { $ifNull: ["$imdb.rating", 0] } },
           totalMovies: { $sum: 1 }
         }
       }
     ]);
     res.json({ genreStats: stats, overall: overall[0] });
   } catch (err) {
-    res.status(500).json({ error: "Failed to aggregate statistics" });
+    res.status(500).json({ error: "Failed to aggregate statistics", details: err.message });
   }
 };
 
