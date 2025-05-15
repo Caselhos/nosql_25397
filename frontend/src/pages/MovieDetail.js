@@ -12,7 +12,7 @@ const MovieDetail = () => {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/${id}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/movies/${id}`);
         setMovie(res.data);
       } catch (err) {
         console.error(err);

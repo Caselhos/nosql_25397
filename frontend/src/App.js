@@ -2,8 +2,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import MovieList from "./components/MovieList";
-import MovieDetail from "./components/MovieDetail"; // You can build this next
+import MovieList from "./pages/MovieList";
+import MovieDetail from "./pages/MovieDetail"; // You can build this next
 
 function App() {
   return (
