@@ -9,7 +9,7 @@ exports.getMovies = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const movies = await Movie.find()
-      .select("title year poster genres")
+      .select("_id title year poster genres")
       .skip(skip)
       .limit(limit)
       .sort({ year: -1 });
@@ -25,5 +25,15 @@ exports.getMovies = async (req, res) => {
   } catch (err) {
     console.error("Error fetching movies:", err);
     res.status(500).json({ error: "Server error while fetching movies" });
+  }
+};
+
+exports.getMovieById = async (req, res) => {
+  try {
+    const movie = await Movie.findById(req.params.id);
+    if (!movie) return res.status(404).json({ error: "Movie not found" });
+    res.json(movie);
+  } catch (err) {
+    res.status(500).json({ error: "Server error while fetching movie" });
   }
 };
