@@ -70,3 +70,53 @@ exports.deleteMovie = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+// Aggregation/statistics: genre counts and average IMDB rating
+exports.getMovieStats = async (req, res) => {
+  try {
+    const stats = await Movie.aggregate([
+      {
+        $unwind: "$genres"
+      },
+      {
+        $group: {
+          _id: "$genres",
+          count: { $sum: 1 },
+          avgRating: { $avg: "$imdb.rating" }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+    const overall = await Movie.aggregate([
+      {
+        $group: {
+          _id: null,
+          avgImdbRating: { $avg: "$imdb.rating" },
+          totalMovies: { $sum: 1 }
+        }
+      }
+    ]);
+    res.json({ genreStats: stats, overall: overall[0] });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to aggregate statistics" });
+  }
+};
+
+// Full-text search
+exports.searchMovies = async (req, res) => {
+  try {
+    const q = req.query.q;
+    if (!q) return res.status(400).json({ error: "Missing search query" });
+    const movies = await Movie.find(
+      { $text: { $search: q } },
+      { score: { $meta: "textScore" } }
+    )
+      .sort({ score: { $meta: "textScore" } })
+      .limit(20);
+    res.json(movies);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to search movies" });
+  }
+};

@@ -9,5 +9,7 @@ router.get("/movies/:id", movieController.getMovieById);
 router.post("/movies", movieController.createMovie);
 router.put("/movies/:id", movieController.updateMovie);
 router.delete("/movies/:id", movieController.deleteMovie);
+router.get("/movies/search", movieController.searchMovies);
+router.get("/movies/stats", movieController.getMovieStats);
 
 module.exports = router;
