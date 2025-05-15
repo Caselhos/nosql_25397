@@ -1,7 +1,7 @@
 // src/components/MovieDetail.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Container, Typography, Box, Chip, CircularProgress } from "@mui/material";
+import { Container, Typography, Box, Chip, CircularProgress, Paper } from "@mui/material";
 import axios from "axios";
 
 const MovieDetail = () => {
@@ -25,7 +25,6 @@ const MovieDetail = () => {
   }, [id]);
 
   if (loading) return <CircularProgress sx={{ m: 4 }} />;
-
   if (!movie) return <Typography>Movie not found.</Typography>;
 
   return (
@@ -35,13 +34,24 @@ const MovieDetail = () => {
       </Typography>
       <Box component="img" src={movie.poster} alt={movie.title} sx={{ width: 300, mb: 2 }} />
       <Box sx={{ mb: 2 }}>
-        {movie.genres.map((genre, idx) => (
+        {movie.genres && movie.genres.map((genre, idx) => (
           <Chip key={idx} label={genre} sx={{ mr: 1 }} />
         ))}
       </Box>
-      <Typography variant="body1">
-        {/* You can expand this later with description, cast, etc. */}
-        More details coming soon!
+      {movie.plot && (
+        <Paper sx={{ p: 2, mb: 2 }}>
+          <Typography variant="subtitle1" gutterBottom>Plot</Typography>
+          <Typography variant="body1">{movie.plot}</Typography>
+        </Paper>
+      )}
+      {movie.imdb && (
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          <strong>IMDB Rating:</strong> {movie.imdb.rating} ({movie.imdb.votes} votes)
+        </Typography>
+      )}
+      {/* Add more fields as needed, e.g. directors, cast, etc. */}
+      <Typography variant="caption" color="text.secondary">
+        MongoDB _id: {movie._id}
       </Typography>
     </Container>
   );
